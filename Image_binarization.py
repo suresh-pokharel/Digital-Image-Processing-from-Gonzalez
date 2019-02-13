@@ -2,23 +2,19 @@
 import numpy as np
 from PIL import Image
 import math
+import matplotlib.pyplot as plt
 
 
 class ImageClass:
-    def __init__(self):
-        self.width = 0
-        self.height = 0
-        self.pixels = 0
+    def __init__(self, image_path):
+        self.img = Image.open(image_path)
+        self.pixels = self.img.load()
+        self.width, self.height = self.img.size
         self.RGB = []
         self.gs_value = []
-        self.img = 0
 
-    def load_image(self, path):
+    def get_rgb(self):
         # returns array of RGB values from Image
-        self.img = Image.open(path)
-        self.pixels = self.img.load()
-        print('Original -- ',self.pixels)
-        self.width, self.height = self.img.size
         for i in range(self.width):
             rgb_temp = []
             for j in range(self.height):
@@ -29,12 +25,12 @@ class ImageClass:
             self.RGB.append(rgb_temp)
         return self.RGB
 
-    def rgb_to_gray_scale(self,pixels):
-
+    def rgb_to_gray_scale(self):
+        pixels = self.get_rgb()
         # convert RGB image to gray scale
         # pixels in array of RGB form eg. [[225, 137, 127], [225, 137, 127], [227, 137, 122]...]
         for rows in pixels:
-            gs_temp = [] # to store gs value for a row
+            gs_temp = []  # to store gs value for a row
             for pixel in rows:
                 # c_linear = 0.2126 * R + 0.7152 * G + 0.0722 * B
                 # From https: // stackoverflow.com / questions / 17615963 / standard - rgb - to - grayscale - conversion
@@ -48,10 +44,19 @@ class ImageClass:
 
                 # c_srgb returns in 0-1 range, so convert to 255 scale
                 px_value = math.ceil(c_linear)
-                print(c_srgb)
                 gs_temp.append(px_value)
             self.gs_value.append(gs_temp)
         return self.gs_value
+
+    def negative_image(self):
+        for i in range(self.width):
+            for j in range(self.height):
+                r = 255 - self.pixels[i,j][0]  # inversion R
+                g = 255 - self.pixels[i,j][1]  # inversion G
+                b = 255 - self.pixels[i,j][2]  # inversion B
+                self.pixels[i,j] = (r,g,b)
+
+        self.img.show()
 
     def display_image(self,pixels):
         result_path = 'Images/leena.png'
@@ -60,8 +65,15 @@ class ImageClass:
         for i in range(self.width):
             for j in range(self.height):
                 self.pixels[i,j] = pixels[i][j]
-        self.img.save('result.jpg')
+        self.img.save('Images/result.jpg')
 
+    def histogram_plot(self):
+        gs = self.rgb_to_gray_scale()
+        print(gs)
+        plt.hist(gs, bins=8)
+        x_labels = range(0, (17+1)*15, 15)[1:] # [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160,170,180,190]
+        plt.xticks(x_labels)
+        plt.show()
 # img = Image.open('Images/leena.png')
 # pixels = img.load()
 # width, height = img.size
@@ -94,10 +106,9 @@ class ImageClass:
 # img.show('Images/result1.png')
 
 
-img = ImageClass()
-RGB = img.load_image('Images/leena.png')
-
-# print(RGB)
-gs = img.rgb_to_gray_scale(RGB)
-# print(gs)
-img.display_image(gs)
+img = ImageClass('Images/leena.png')
+# img.negative_image()
+# rgb = img.get_rgb()
+# gs = img.rgb_to_gray_scale()
+img.histogram_plot()
+#img.display_image(gs)
