@@ -67,6 +67,29 @@ class ImageClass:
                 self.pixels[i,j] = pixels[i][j]
         self.img.save('Images/result.jpg')
 
+    def bit_plane_slicing(self):
+        gs_values = self.rgb_to_gray_scale()
+        binary_values = []  # to hold binary value of each pixel
+        for row in gs_values:
+            bin_row_temp = []
+            for pixel in row:
+                bin_temp = "{0:08b}".format(pixel)  # convert into 8 bit binary value
+                bin_row_temp.append(bin_temp)
+            binary_values.append(bin_row_temp)  # push each row
+
+        #  here we have binary 8 bit value for each of pixels  gray scale
+        #  we need to slice each pixel's bit
+
+        slices = [[], [], [], [], [], [], [], []]  # to store slices 0,1,2...7
+        for row in binary_values:
+            temp_slice_rows = [[], [], [], [], [], [], [], []]
+            for pixel in row:
+                    for i in range(8):  # go through each bit 0-7
+                        temp_slice_rows[i].append(pixel[i])  # get ith value of string
+
+            for j in range(8):
+                slices[j].append(temp_slice_rows[j])
+
     def histogram_plot(self):
         gs = self.rgb_to_gray_scale()
         print(gs)
@@ -111,4 +134,5 @@ img = ImageClass('Images/leena.png')
 # rgb = img.get_rgb()
 # gs = img.rgb_to_gray_scale()
 img.histogram_plot()
-#img.display_image(gs)
+# img.display_image(gs)
+img.bit_plane_slicing()
