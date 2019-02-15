@@ -55,7 +55,24 @@ class ImageClass:
                 g = 255 - self.pixels[i,j][1]  # inversion G
                 b = 255 - self.pixels[i,j][2]  # inversion B
                 self.pixels[i,j] = (r,g,b)
+        self.img.show()
 
+    def log_transformation(self, c):  # s = clog(1+r)
+        for i in range(self.width):
+            for j in range(self.height):
+                r = c * math.ceil(math.log10(1 + self.pixels[i, j][0]))
+                g = c * math.ceil(math.log10(1 + self.pixels[i, j][1]))
+                b = c * math.ceil(math.log10(1 + self.pixels[i, j][2]))
+                self.pixels[i, j] = (r, g, b)
+        self.img.show()
+
+    def power_transformation(self, c, lambda_value):  # s = c*r^lambda
+        for i in range(self.width):
+            for j in range(self.height):
+                r = c * math.ceil(math.pow(self.pixels[i, j][0], lambda_value))
+                g = c * math.ceil(math.pow(self.pixels[i, j][1], lambda_value))
+                b = c * math.ceil(math.pow(self.pixels[i, j][2], lambda_value))
+                self.pixels[i, j] = (r, g, b)
         self.img.show()
 
     def display_image(self,pixels):
@@ -85,10 +102,20 @@ class ImageClass:
             temp_slice_rows = [[], [], [], [], [], [], [], []]
             for pixel in row:
                     for i in range(8):  # go through each bit 0-7
-                        temp_slice_rows[i].append(pixel[i])  # get ith value of string
+                        temp_slice_rows[i].append(int(pixel[i]))  # get ith value of string, converting to int
 
             for j in range(8):
                 slices[j].append(temp_slice_rows[j])
+
+        # display LSB slice TEST
+        for i in range(8): # for eight slices
+            for j in range(self.width):
+                for k in range(self.height):
+                    bit = slices[i][j][k]
+                    bit = bit * 255
+                    self.pixels[j,k] = bit
+            self.img.show()
+        return slices
 
     def histogram_plot(self):
         gs = self.rgb_to_gray_scale()
@@ -133,6 +160,8 @@ img = ImageClass('Images/leena.png')
 # img.negative_image()
 # rgb = img.get_rgb()
 # gs = img.rgb_to_gray_scale()
-img.histogram_plot()
+# img.histogram_plot()
 # img.display_image(gs)
-img.bit_plane_slicing()
+img.power_transformation(99, 0.5)
+# slices = img.bit_plane_slicing()
+# print(slices)
