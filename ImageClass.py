@@ -75,6 +75,23 @@ class ImageClass:
                 self.pixels[i, j] = (r, g, b)
         self.img.show()
 
+    def averaging_mask(self,m_size):
+         # averaging matrix m_size*m_size
+        for i in range(self.width-m_size):
+            for j in range(self.height-m_size):
+                #  calculate new value for R,G,B
+                sum_r =0
+                sum_g=0
+                sum_b = 0
+                for p in range(m_size):
+                    for q in range(m_size):
+                        sum_r = sum_r + self.pixels[i + p, j + q][0]
+                        sum_g = sum_g + self.pixels[i + p, j + q][1]
+                        sum_b = sum_b + self.pixels[i + p, j + q][2]
+                total_blocks = m_size*m_size
+                self.pixels[i,j] = (math.ceil(sum_r/total_blocks), math.ceil(sum_g/total_blocks), math.ceil(sum_b/total_blocks))
+        self.img.show()
+
     def display_image(self,pixels):
         result_path = 'Images/leena.png'
         self.img = Image.open(result_path)
@@ -112,8 +129,8 @@ class ImageClass:
             for j in range(self.width):
                 for k in range(self.height):
                     bit = slices[i][j][k]
-                    bit = bit * 255
-                    self.pixels[j,k] = bit
+                    bit = bit * 127
+                    self.pixels[j, k] = (bit, bit, bit)
             self.img.show()
         return slices
 
@@ -121,7 +138,7 @@ class ImageClass:
         gs = self.rgb_to_gray_scale()
         print(gs)
         plt.hist(gs, bins=8)
-        x_labels = range(0, (17+1)*15, 15)[1:] # [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160,170,180,190]
+        x_labels = range(0, (17+1)*15, 15)[1:]  # [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160,170,180,190]
         plt.xticks(x_labels)
         plt.show()
 # img = Image.open('Images/leena.png')
@@ -156,13 +173,14 @@ class ImageClass:
 # img.show('Images/result1.png')
 
 
-img = ImageClass('Images/Leena.png')
+img = ImageClass('Images/leena.jpeg')
 # img.negative_image()
 # rgb = img.get_rgb()
 # gs = img.rgb_to_gray_scale()
 # img.histogram_plot()
 # img.display_image(gs)
-img.log_transformation(7)
+# img.log_transformation(7)
 # img.power_transformation(99, 2.5)
 # img.bit_plane_slicing()
+img.averaging_mask(15)
 # print(slices)
