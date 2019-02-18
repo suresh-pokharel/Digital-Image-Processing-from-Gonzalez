@@ -156,12 +156,13 @@ class ImageClass:
 # img.show('Images/result1.png')
 
 
-img = ImageClass('Images/leena.png')
+img = ImageClass('Images/Leena.png')
 # img.negative_image()
 # rgb = img.get_rgb()
 # gs = img.rgb_to_gray_scale()
 # img.histogram_plot()
 # img.display_image(gs)
-img.power_transformation(99, 0.5)
-# slices = img.bit_plane_slicing()
+img.log_transformation(7)
+# img.power_transformation(99, 2.5)
+# img.bit_plane_slicing()
 # print(slices)
