@@ -1,11 +1,19 @@
+"""
+      Author  : Suresh Pokharel
+      Email   : suresh.wrc@gmail.com
+      GitHub  : github.com/suresh021
+      URL     : psuresh.com.np
+"""
 
-import numpy as np
+
 from PIL import Image
 import math
 import matplotlib.pyplot as plt
+import cv2
+import numpy as np
 
 
-class ImageClass:
+class Spatial:
     def __init__(self, image_path):
         self.img = Image.open(image_path)
         self.pixels = self.img.load()
@@ -92,6 +100,51 @@ class ImageClass:
                 self.pixels[i,j] = (math.ceil(sum_r/total_blocks), math.ceil(sum_g/total_blocks), math.ceil(sum_b/total_blocks))
         self.img.show()
 
+    def average_mask_cv2(self,m,n):
+        img = cv2.imread('Images/leena.jpeg')
+
+        blur = cv2.blur(img, (m, n))
+
+        plt.subplot(121), plt.imshow(img), plt.title('Original')
+        plt.xticks([]), plt.yticks([])
+        plt.subplot(122), plt.imshow(blur), plt.title('Blurred')
+        plt.xticks([]), plt.yticks([])
+        plt.show()
+
+    def gaussian_cv2(self, path, m, n):
+        img = cv2.imread(path)
+        kernel = np.ones((m, n), np.float32) / (m * n)
+        dst = cv2.filter2D(img, -1, kernel)
+
+        plt.subplot(121), plt.imshow(img), plt.title('Original')
+        plt.xticks([]), plt.yticks([])
+        plt.subplot(122), plt.imshow(dst), plt.title('Averaging')
+        plt.xticks([]), plt.yticks([])
+        plt.show()
+
+    def weighted_masking(self, mask, m_size):
+         # mask  matrix m_size*m_size
+        a = int((m_size-1)/2)
+        b = int((m_size-1)/2)
+
+
+        for i in range(1, self.width-1):
+            for j in range(1, self.height-1):
+                #  calculate new value for R,G,B
+                sum = 0
+                for s in range(-1, 1, 1):
+                    for t in range(-1, 1, 1):
+                        pix = self.pixels[i+s, j+t]
+                        gs = self.rgb_to_gs_single(pix)
+                        sum = sum + gs * mask[s+1][t+1]
+                final_value = int(sum)
+                self.pixels[i,j] = (final_value, final_value, final_value)
+        self.img.show()
+
+
+    def rgb_to_gs_single(self, pix):
+        return int((0.2126 * pix[0] + 0.7152 * pix[1] + 0.0722 * pix[2]))
+
     def display_image(self,pixels):
         result_path = 'Images/leena.png'
         self.img = Image.open(result_path)
@@ -141,39 +194,10 @@ class ImageClass:
         x_labels = range(0, (17+1)*15, 15)[1:]  # [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160,170,180,190]
         plt.xticks(x_labels)
         plt.show()
-# img = Image.open('Images/leena.png')
-# pixels = img.load()
-# width, height = img.size
-#
-# print(img.convert('L'))
-# for i in range(width):
-#     for j in range(height):
-#         print (pixels[i,j])
-#         # https: // stackoverflow.com / questions / 17615963 / standard - rgb - to - grayscale - conversion
-#         R = pixels[i,j][0]/255 # convert R value into range 0-1
-#         G = pixels[i,j][1]/255 # convert G value into range 0-1
-#         B = pixels[i,j][2]/255 # convert B value into range 0-1
-#
-#         c_linear = 0.2126 * R + 0.7152 * G + 0.0722 * B
-#
-#         if c_linear <= 0.0031308:
-#             c_srgb = 12.92 * c_linear
-#         else:
-#             c_srgb = 1.055 * c_linear**(1/2.4) - 0.055
-#
-#         print (c_srgb)
-#         px_value = math.ceil(c_linear*255)
-#         if(px_value > 128):
-#             px_value = 255
-#         else:
-#             px_value = 0
-#         print(px_value)
-#         pixels[i, j] = (px_value, px_value, px_value)
-#
-# img.show('Images/result1.png')
 
 
-img = ImageClass('Images/leena.jpeg')
+
+img = Spatial('Images/leena.jpeg')
 # img.negative_image()
 # rgb = img.get_rgb()
 # gs = img.rgb_to_gray_scale()
@@ -181,6 +205,9 @@ img = ImageClass('Images/leena.jpeg')
 # img.display_image(gs)
 # img.log_transformation(7)
 # img.power_transformation(99, 2.5)
+# mask = [[1, 1, 1], [1, 1, 1], [1, 1, 1]]
+# img.averaging_mask(15)
+# img.average_mask_cv2(9, 9)
+img.gaussian_cv2('Images/leena.jpeg', 5, 5)
+# img.weighted_masking(mask, 3)
 # img.bit_plane_slicing()
-img.averaging_mask(15)
-# print(slices)
